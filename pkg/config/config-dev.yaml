@@ -1,0 +1,26 @@
+server:
+  appVersion: "1.0.0"
+  host: "localhost"
+  port: "5000"
+  mode: "Dev"
+  readTimeout: 5
+  writeTimeout: 5
+  maxHeaderBytes: 10
+  ctxTimeout: 4
+
+logger:
+  development: true
+  encoding: json
+  level: info
+
+jaeger:
+  host: localhost:6831
+  serviceName: real-time-trade
+  logSpans: false
+
+metric:
+  url: localhost:7070
+  serviceName: real-time-trade
+
+tickers:
+  tickers: btcusdt,ethusdt,busdusdt,bnbusdt,ltcusdt,xrpusdt,maticusdt
