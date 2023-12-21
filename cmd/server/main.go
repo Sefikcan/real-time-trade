@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/opentracing/opentracing-go"
 	"github.com/sefikcan/read-time-trade/internal/server"
-	"github.com/sefikcan/read-time-trade/internal/trades"
 	"github.com/sefikcan/read-time-trade/pkg/config"
 	"github.com/sefikcan/read-time-trade/pkg/logger"
 	"github.com/uber/jaeger-client-go"
@@ -12,7 +11,6 @@ import (
 	"github.com/uber/jaeger-lib/metrics"
 	"io"
 	"log"
-	"strings"
 )
 
 func main() {
@@ -53,17 +51,7 @@ func main() {
 		}
 	}(closer)
 	zapLogger.Info("Opentracing connected")
-
-	topics := strings.Split(cfg.Tickers.Tickers, ",")
-	for i, topic := range topics {
-		topics[i] = strings.Trim(strings.Trim(topic, "\\"), "\"")
-	}
-
-	err = trades.SubscribeAndListen(topics)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	
 	s := server.NewServer(cfg, zapLogger)
 	if err = s.Run(); err != nil {
 		log.Fatal(err)

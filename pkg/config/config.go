@@ -60,6 +60,12 @@ type TickerConfig struct {
 }
 
 type KafkaConfig struct {
+	Brokers           []string `mapstructure:"brokers"`
+	GroupID           string   `mapstructure:"groupID"`
+	InitTopics        bool     `mapstructure:"initTopics"`
+	TopicName         string   `mapstructure:"topicName"`
+	Partitions        int      `mapstructure:"partitions"`
+	ReplicationFactor int      `mapstructure:"replicationFactor"`
 }
 
 func NewConfig() *Config {

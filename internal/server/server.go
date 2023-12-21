@@ -4,11 +4,14 @@ import (
 	"context"
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"github.com/sefikcan/read-time-trade/internal/trades"
 	"github.com/sefikcan/read-time-trade/pkg/config"
+	"github.com/sefikcan/read-time-trade/pkg/kafka"
 	"github.com/sefikcan/read-time-trade/pkg/logger"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -48,6 +51,20 @@ func (s *Server) Run() error {
 			s.logger.Errorf("Error ListenAndServe: %s", err)
 		}
 	}()
+
+	kafkaProducer := kafka.NewProducer(s.logger, s.cfg.Kafka.Brokers)
+	defer kafkaProducer.Close()
+
+	topics := strings.Split(s.cfg.Tickers.Tickers, ",")
+	for i, topic := range topics {
+		topics[i] = strings.Trim(strings.Trim(topic, "\\"), "\"")
+	}
+
+	tradeListener := trades.NewTradeListener(s.logger, s.cfg, kafkaProducer)
+	err := tradeListener.SubscribeAndListen(topics)
+	if err != nil {
+		s.logger.Fatal(err)
+	}
 
 	if err := s.MapHandlers(s.echo); err != nil {
 		return err
